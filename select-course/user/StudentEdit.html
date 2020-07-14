@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>编辑用户信息</title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+<body>
+<!--自定义代码start-->
+<article class="cl pd-20">
+    <div class="form form-horizontal">
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>学生名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入名字" id="name" name="name">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>班&nbsp;&nbsp;&nbsp;级：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入班级" name="className" id="className">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>性别：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入性别" name="userSex" id="userSex">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>身份证号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入身份证号" name="idCard" id="idCard">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>手机：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入手机" name="mobile" id="mobile">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>学号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入学号" name="businessNumber" id="businessNumber">
+            </div>
+        </div>
+
+<!--        <div class="row cl">-->
+<!--            <label class="form-label col-xs-4 col-sm-2">用户状态：</label>-->
+<!--            <div class="formControls col-xs-8 col-sm-9 skin-minimal">-->
+<!--                <div class="radio-box">-->
+<!--                    <input name="status" type="radio" value="1" id="userStatus-1" checked>-->
+<!--                    <label for="userStatus-1">启用</label>-->
+<!--                </div>-->
+<!--                <div class="radio-box">-->
+<!--                    <input type="radio" name="status" value="0" id="userStatus-2">-->
+<!--                    <label for="userStatus-2">停用</label>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" type="button" id="submitFrom" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+            </div>
+        </div>
+    </div>
+</article>
+
+<!--自定义代码end-->
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+
+<script>
+
+    $(function () {
+       //编辑时 把学生信息显示在页面上
+        var userInfoCallBack = function setUserInfo(result) {
+            var studentInfo = result.data;
+            $("#name").val(studentInfo.name);
+            $("#className").val(studentInfo.className);
+            $("#userSex").val(studentInfo.userSex);
+            $("#idCard").val(studentInfo.idCard);
+            $("#mobile").val(studentInfo.mobile);
+            $("#businessNumber").val(studentInfo.businessNumber);
+
+        }
+        //获取url参数的用户id
+        var userId = getParameter("userId");
+
+        //用户id不为空则要获取用户信息
+        if (userId != null && typeof (userId) != 'undefined') {
+            var userReq = {};
+            userReq.userId = userId;
+            sendGetFormDateAjax(baseUrl + "user/selectUserById", userReq, userInfoCallBack);
+
+        }
+
+
+
+
+
+        $("#submitFrom").click(function () {
+            const name = $("#name").val();
+            const className = $("#className").val();
+            const userSex = $("#userSex").val();
+            const idCard = $("#idCard").val();
+            const mobile = $("#mobile").val();
+            const businessNumber = $("#businessNumber").val();
+
+            if (name === '') {
+                layer.msg('请输入用户名', {icon: '-1', time: 1000});
+                $("#name").focus();
+                return;
+            }
+            if (className === '') {
+                layer.msg('请输入邮箱', {icon: '-1', time: 1000});
+                $("#className").focus();
+                return;
+            }
+            if (userSex === '') {
+                layer.msg('请输入手机号码', {icon: '-1', time: 1000});
+                $("#userSex").focus();
+                return;
+            }
+            if (idCard === '') {
+                layer.msg('请输入用户名', {icon: '-1', time: 1000});
+                $("#idCard").focus();
+                return;
+            }
+            if (mobile === '') {
+                layer.msg('请输入邮箱', {icon: '-1', time: 1000});
+                $("#mobile").focus();
+                return;
+            }
+            if (businessNumber === '') {
+                layer.msg('请输入手机号码', {icon: '-1', time: 1000});
+                $("#businessNumber").focus();
+                return;
+            }
+
+
+            var userReq = {};
+            userReq.name = name;
+            userReq.className = className;
+            userReq.userSex = userSex;
+            userReq.idCard = idCard;
+            userReq.mobile = mobile;
+            userReq.businessNumber = businessNumber;
+            userReq.userId = userId;
+
+            //userReq.userId = userId;
+
+            sendPostAjax(baseUrl + 'user/saveStudent', userReq, editCallBack);
+
+
+
+        })
+    })
+
+
+
+</script>
+
+
+
+
+</body>
+</html>

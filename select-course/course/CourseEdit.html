@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>编辑用户信息</title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+<body>
+<!--自定义代码start-->
+<article class="cl pd-20">
+    <div class="form form-horizontal">
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>课程名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入课程名称" id="courseName" name="courseName">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>课程学分：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入课程学分" name="courseCredit" id="courseCredit">
+            </div>
+        </div>
+
+
+
+
+        <!--        <div class="row cl">-->
+        <!--            <label class="form-label col-xs-4 col-sm-2">用户状态：</label>-->
+        <!--            <div class="formControls col-xs-8 col-sm-9 skin-minimal">-->
+        <!--                <div class="radio-box">-->
+        <!--                    <input name="status" type="radio" value="1" id="userStatus-1" checked>-->
+        <!--                    <label for="userStatus-1">启用</label>-->
+        <!--                </div>-->
+        <!--                <div class="radio-box">-->
+        <!--                    <input type="radio" name="status" value="0" id="userStatus-2">-->
+        <!--                    <label for="userStatus-2">停用</label>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius  use-button" permission="sys:course:edit" type="button" id="submitFrom" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+            </div>
+        </div>
+    </div>
+</article>
+
+<!--自定义代码end-->
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+
+<script>
+
+    $(function () {
+        getPerms();
+        //编辑时 把课程信息显示在页面上
+        var courseInfoCallBack = function setCourseInfo(result) {
+            var courseInfo = result.data;
+            $("#courseName").val(courseInfo.courseName);
+            $("#courseCredit").val(courseInfo.courseCredit);
+
+
+        }
+        //获取url参数的用户id
+        var courseId = getParameter("courseId");
+
+        //用户id不为空则要获取用户信息
+        if (courseId != null && typeof (courseId) != 'undefined') {
+            var userReq = {};
+            userReq.courseId = courseId;
+            sendGetFormDateAjax(baseUrl + "course/findCourseByCourseId", userReq, courseInfoCallBack);
+
+        }
+
+
+
+
+
+        $("#submitFrom").click(function () {
+            const courseName = $("#courseName").val();
+            const courseCredit = $("#courseCredit").val();
+
+
+            if (courseName === '') {
+                layer.msg('请输入课程名', {icon: '-1', time: 1000});
+                $("#courseName").focus();
+                return;
+            }
+            if (courseCredit === '') {
+                layer.msg('请输入课程学分', {icon: '-1', time: 1000});
+                $("#courseCredit").focus();
+                return;
+            }
+
+
+
+            var userReq = {};
+            userReq.courseName = courseName;
+            userReq.courseCredit = courseCredit;
+
+            userReq.courseId = courseId;
+
+            //userReq.userId = userId;
+
+            sendPostAjax(baseUrl + 'course/saveCourse', userReq, editCallBack);
+
+
+
+        })
+    })
+
+
+
+</script>
+
+
+
+
+</body>
+</html>

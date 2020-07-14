@@ -1,0 +1,162 @@
+﻿<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>角色列表</title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+<body>
+
+<section>
+    <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+        <span class="c-gray en">&gt;</span>
+        用户管理
+        <span class="c-gray en">&gt;</span>
+        角色列表
+        <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" onclick="getDate();"  title="刷新"><i class="Hui-iconfont">&#xe68f;</i></a>
+    </nav>
+    <div class="Hui-article">
+        <article class="cl pd-20">
+            <div class="text-c">
+                <form id="#form1">
+                    角色名称：<input type="text" class="input-text" style="width:250px" placeholder="输入角色名称" id="roleName"
+                               name="roleName">
+                    <button type="button" class="btn btn-success radius" id="sub" name=""><i
+                            class="Hui-iconfont">&#xe665;</i> 查询
+                    </button>
+                    <button class="btn btn-success radius" id="btn_clear" name="btn_clear"><i
+                            class="Hui-iconfont">&#xe66b;</i> 清空
+                    </button>
+
+                </form>
+            </div>
+            <div class="cl pd-5 bg-1 bk-gray mt-20">
+                <span class="l">
+
+                    <a href="javascript:;" onclick="addRole()" class="btn btn-primary radius use-button" permission ="sys:role:add">
+                        <i class="Hui-iconfont">&#xe600;</i> 添加角色
+                    </a>
+                    <a href="javascript:;" onclick="deleteRoles()" class="btn btn-danger radius use-button" permission ="sys:role:delete">
+                        <i class="Hui-iconfont">&#xe600;</i> 删除角色
+                    </a>
+                </span>
+                <span class="r">共有数据：<strong id="total">0</strong> 条</span></div>
+            <div class="mt-20">
+                <table class="table table-border table-bordered table-bg table-hover table-sort">
+                    <thead>
+                    <tr class="text-c">
+                        <th width="25"><input type="checkbox" name="" value=""></th>
+                        <th width="80" style="display:none">ID</th>
+                        <th width="80px">角色名称</th>
+                        <th width="80px">备注</th>
+                        <th width="80px">创建时间</th>
+                        <th width="120">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tbody" class="text-c">
+                    </tbody>
+                </table>
+                <!-- 分页标签 -->
+                <div id="page1" class="pager"></div>
+            </div>
+        </article>
+    </div>
+</section>
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="../../static/h-ui.selectcourse/js/H-ui.admin.page.js"></script>
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+<script type="text/javascript" src="../../common/page.js"></script>
+<script type="text/javascript">
+    function getDate() {
+        var insertHtml = function (list) {
+            var html = "";
+            $.each(list,
+                function (i, o) {
+                    html += ' <tr class="text-c"> '
+                    html += ' <td><input type="checkbox" value="' + o.roleId + '" name="table_id" class="table_id"></td> '
+                    html += ' <td style="display:none">' + o.roleId + '</td> '
+                    html += ' <td>' + o.roleName + '</td> '
+                    html += ' <td>' + checkNull(o.roleRemark) + '</td> '
+                    html += ' <td>' + o.createTime + '</td> '
+
+                    html += ' <td class="td-manage"> '
+                    html += ' <a title="编辑" href="javascript:;" onclick="updateRole(' + "'" + o.roleId + "'" + ')" class="ml-5 use-button " style="text-decoration:none" permission ="sys:role:edit"> '
+                    html += ' <i class="Hui-iconfont ">&#xe6df;</i> '
+                    html += ' </a> '
+                    html += ' <a style="text-decoration:none" onClick="deleteRole(' + "'" + o.roleId + "'" + ')" href="javascript:;" class="use-button" title="删除" permission ="sys:role:delete"> '
+                    html += ' <i class="Hui-iconfont">&#xe6e2;</i></a> '
+                    html += ' </td> '
+
+                    html += ' </tr> ';
+                });
+
+            return html;
+        };
+
+        var username = $("#username").val();
+        var mobile = $("#mobile").val();
+        var pageUserQueryReq = {};
+        pageUserQueryReq.username = username;
+        pageUserQueryReq.mobile = mobile;
+
+        tableInit(baseUrl + 'role/listRolePage', 10, pageUserQueryReq, insertHtml);
+    }
+
+    getDate();
+
+    // 提交表单
+    $("#sub").click(function () {
+        getDate();
+    });
+
+    //添加用户
+    function addRole() {
+        layer_show('添加角色信息', './roleEdit.html', '1050', '650');
+    }
+
+    //更新角色
+    function updateRole(object) {
+        layer_show('添加用户信息', './roleEdit.html?roleId=' + object, '1050', '650');
+    }
+
+    //刷新当前页面
+    function localRefresh() {
+        getDate();
+    }
+
+    //角色编辑回调函数
+    const deleteRoleCallBack = function userEditCallBack() {
+        layer.msg('删除成功', {icon: '-1', time: 1000});
+        setTimeout(localRefresh, 1000);
+    };
+
+    //删除用户
+    function deleteRole(object) {
+        layer.confirm('确定要删除该角色吗？', function () {
+            const userReq = {};
+            userReq.userId = object;
+            sendGetFormDateAjax(baseUrl + "role/deleteUserByUserId", userReq, deleteRoleCallBack);
+        });
+    }
+
+    //删除多个用户
+    function deleteRoles() {
+
+        alert(JSON.stringify(getTableCheckedIds()))
+    }
+
+    $(function () {
+        getPerms();
+    });
+
+</script>
+</body>
+</html>

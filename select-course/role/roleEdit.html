@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>编辑用户信息</title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../lib/zTree/v3/css/zTreeStyle/zTreeStyle.css" type="text/css">
+</head>
+<body>
+<!--自定义代码start-->
+
+<section class="Hui-article-box">
+    <div class="Hui-article">
+        <article class="cl pd-20">
+            <table class="table">
+                <tr>
+                    <td width="200" class="va-t">
+                        <ul id="permissionTree" class="ztree"></ul>
+                    </td>
+                    <td class="va-t">
+
+                        <article class="cl pd-20">
+                            <form class="form form-horizontal"
+                                  id="form-member-add">
+
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>角色名：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <input type="text" class="input-text" placeholder="输入角色名" id="roleName"
+                                               name="roleName">
+                                    </div>
+                                </div>
+
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-2">备注：</label>
+                                    <div class="formControls col-xs-8 col-sm-9">
+                                        <textarea name="remark" id="remark" cols="" rows="" class="textarea"
+                                                  onKeyUp="textareaLengthCheck(this,200)" placeholder="输入备注"></textarea>
+                                        <p class="textarea-numberbar"><em class="textarea-length">0</em>/200</p>
+                                    </div>
+                                </div>
+
+                                <div class="row cl">
+                                    <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                                        <input class="btn btn-primary radius user-button " permission="sys:role:edit sys:role:add" type="button" id="roleSave"
+                                               value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+                                    </div>
+                                </div>
+
+                            </form>
+                        </article>
+
+                    </td>
+                </tr>
+            </table>
+        </article>
+    </div>
+</section>
+
+<!--自定义代码end-->
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+<script type="text/javascript" src="../../lib/zTree/v3/js/jquery.ztree.all-3.5.min.js"></script>
+<script>
+    $(function () {
+        const setting = {
+            check: {
+                /**复选框**/
+                enable: true,
+                chkboxType: {"Y": "ps", "N": "ps"}
+            },
+            view: {
+                //dblClickExpand: false,
+                expandSpeed: 300 //设置树展开的动画速度，IE6下面没效果，
+            },
+            data: {
+                simpleData: {   //简单的数据源，一般开发中都是从数据库里读取，API有介绍，这里只是本地的
+                    enable: true,
+                    idKey: "id",  //id和pid 树的目录级别
+                    pIdKey: "pId",
+                    rootPId: 0   //根节点
+                }
+            }
+        };
+
+        const roleCallBack = function roleCallBack(result) {
+
+            const roleInfo = result.data;
+            $("#roleName").val(roleInfo.roleName);
+            $("#remark").val(roleInfo.roleRemark);
+
+            const permissionTreeList = roleInfo.menus;
+            if (typeof (permissionTreeList) == "undefined" || permissionTreeList == null) {
+                layer.msg('暂无权限树信息，前先添加', {icon: '-1', time: 1000});
+                return;
+            }
+            $.fn.zTree.init($("#permissionTree"), setting, permissionTreeList);
+            const treeObj = $.fn.zTree.getZTreeObj("permissionTree");
+            treeObj.expandAll(true);
+
+        };
+
+        //获取选中的菜单id
+        function getPermissionTreeList() {
+            const treeObj = $.fn.zTree.getZTreeObj("permissionTree");
+            const $nodes = treeObj.getCheckedNodes(true);
+            const arr = [];
+            for (let i = 0; i < $nodes.length; i++) {
+                arr[i] = $nodes[i].id;
+            }
+            return arr;
+        }
+
+        //初始化树数据
+        const menuQuery = {};
+        const roleId = getParameter("roleId");
+        if (roleId != null && typeof (roleId) != 'undefined') {
+            menuQuery.roleId = roleId;
+        }
+        sendGetFormDateAjax(baseUrl + 'menu/selectAllMenuByRoleId', menuQuery, roleCallBack);
+
+        //表单提交
+        $("#roleSave").click(function () {
+            const roleName = $("#roleName").val();
+            if (roleName === '') {
+                layer.msg('请输入角色名称', {icon: '-1', time: 1000});
+                $("#roleName").focus();
+                return;
+            }
+            const remarks = $("textarea[name='remark']").val();
+            const menuIds = getPermissionTreeList();
+            const roleSaveReq = {};
+            roleSaveReq.roleId = roleId;
+            roleSaveReq.roleName = roleName;
+            roleSaveReq.roleRemark = remarks;
+            roleSaveReq.menuIdList = menuIds;
+
+            sendPostAjax(baseUrl + 'menu/saveMenusByRoleId', roleSaveReq, editCallBack);
+        });
+
+        getPerms();
+    });
+
+    // 判断备注长度
+    function textareaLengthCheck(obj, number) {
+        const remarks = $("textarea[name='remark']").val();
+        $(".textarea-length").html(remarks.length);
+        if (remarks.length > number) {
+            layer.msg('最大长度不能超过200', {icon: '-1', time: 1000});
+            return;
+        }
+    }
+</script>
+</body>
+</html>

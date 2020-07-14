@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>编辑教室信息</title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+<body>
+<!--自定义代码start-->
+<article class="cl pd-20">
+    <div class="form form-horizontal">
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2"><span class="c-red">*</span>教室名：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" placeholder="输入教室名称" id="classRoomName" name="classRoomName">
+            </div>
+        </div>
+
+
+
+
+
+        <!--        <div class="row cl">-->
+        <!--            <label class="form-label col-xs-4 col-sm-2">用户状态：</label>-->
+        <!--            <div class="formControls col-xs-8 col-sm-9 skin-minimal">-->
+        <!--                <div class="radio-box">-->
+        <!--                    <input name="status" type="radio" value="1" id="userStatus-1" checked>-->
+        <!--                    <label for="userStatus-1">启用</label>-->
+        <!--                </div>-->
+        <!--                <div class="radio-box">-->
+        <!--                    <input type="radio" name="status" value="0" id="userStatus-2">-->
+        <!--                    <label for="userStatus-2">停用</label>-->
+        <!--                </div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius user-button" permission="sys:classroom:edit" type="button" id="submitFrom" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+            </div>
+        </div>
+    </div>
+</article>
+
+<!--自定义代码end-->
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+
+<script>
+
+    $(function () {
+        getPerms();
+        //编辑时 把学生信息显示在页面上
+        var courseInfoCallBack = function setCourseInfo(result) {
+            var classroomInfo = result.data;
+            $("#classRoomName").val(classroomInfo.classroomName);
+
+
+        }
+        //获取url参数的用户id
+        var classroomId = getParameter("classroomId");
+
+        //用户id不为空则要获取用户信息
+        if (classroomId != null && typeof (classroomId) != 'undefined') {
+            var userReq = {};
+            userReq.classroomId = classroomId;
+            sendGetFormDateAjax(baseUrl + "classroom/findClassroomByClassRoomId", userReq, courseInfoCallBack);
+
+        }
+
+        $("#submitFrom").click(function () {
+            const classroomName = $("#classRoomName").val();
+
+            if (classroomName === '') {
+                layer.msg('请输入教室名', {icon: '-1', time: 1000});
+                $("#classRoomName").focus();
+                return;
+            }
+            var userReq = {};
+            userReq.classroomName = classroomName;
+            userReq.classroomId = classroomId;
+            sendPostAjax(baseUrl + 'classroom/saveClassRoom', userReq, editCallBack);
+        })
+    })
+
+
+
+</script>
+
+
+
+
+</body>
+</html>

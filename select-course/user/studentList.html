@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+
+<body>
+<section>
+    <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+        <span class="c-gray en">&gt;</span>
+        用户管理
+        <span class="c-gray en">&gt;</span>
+        学生列表
+        <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" onclick="getDate();" title="刷新"><i
+                class="Hui-iconfont">&#xe68f;</i></a>
+    </nav>
+    <div class="Hui-article">
+        <article class="cl pd-20">
+            <div class="text-c">
+                <form id="#form1">
+                    姓名：<input type="text" class="input-text" style="width:250px" placeholder="输入姓名" id="name"
+                              name="name">
+                    手机号码：<input type="text" class="input-text" style="width:250px" placeholder="输入手机号码" id="mobile"
+                                name="mobile">
+                    <button type="button" class="btn btn-success radius" id="sub" name=""  onclick="getDate()"><i
+                            class="Hui-iconfont">&#xe665;</i> 查询
+                    </button>
+                    <button class="btn btn-success radius" id="btn_clear" name="btn_clear"><i
+                            class="Hui-iconfont">&#xe66b;</i> 清空
+                    </button>
+
+                </form>
+            </div>
+            <div class="cl pd-5 bg-1 bk-gray mt-20">
+                <span class="l">
+
+                    <a href="javascript:;" onclick="addStudent()" class="btn btn-primary radius use-button" permission="sys:user:add">
+                        <i class="Hui-iconfont">&#xe600;</i> 添加学生
+                    </a>
+                    <a href="javascript:;" onclick="deleteStudent()" class="btn btn-danger radius use-button" permission="sys:user:delete">
+                        <i class="Hui-iconfont">&#xe609;</i> 删除学生
+                    </a>
+                    <a href="javascript:;" onclick="exportStudent()" class="btn btn-primary radius use-button" permission="sys:user:export">
+                        <i class="Hui-iconfont">&#xe644;</i> 导出学生信息
+                    </a>
+                </span>
+                <span class="r">共有数据：<strong id="total">0</strong> 条</span></div>
+            <div class="mt-20">
+                <table class="table table-border table-bordered table-bg table-hover table-sort">
+                    <thead>
+                    <tr class="text-c">
+                        <th width="25"><input type="checkbox" name="" value=""></th>
+                        <th width="80" style="display:none">ID</th>
+                        <th width="80px">学生ID</th>
+                        <th width="80px">学生名字</th>
+                        <th width="80px">班级</th>
+                        <th width="80">性别</th>
+                        <th width="120">手机</th>
+                        <th width="120">操作</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tbody" class="text-c">
+                    </tbody>
+                </table>
+                <!-- 分页标签 -->
+                <div id="page1" class="pager"></div>
+            </div>
+        </article>
+    </div>
+</section>
+<!--隐藏input-->
+<input class="use-button-list" type="hidden" permission="sys:user:list"/>
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="../../static/h-ui.selectcourse/js/H-ui.admin.page.js"></script>
+
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+<script type="text/javascript" src="../../common/page.js"></script>
+<script type="text/javascript">
+    function getDate() {
+
+
+        var insertHtml = function (list) {
+            var html = "";
+            $.each(list,
+                function (i, o) {
+                    html += ' <tr class="text-c"> '
+                    html += ' <td><input type="checkbox" value="' + o.businessNumber + '" name="table_id" class="table_id"></td> '
+                    html += ' <td style="display:none">' + o.businessNumber + '</td> '
+                    html += ' <td>' + o.businessNumber + '</td> '
+                    html += ' <td>' + o.name + '</td> '
+                    html += ' <td>' + o.className + '</td> '
+                    html += ' <td>' + o.userSex + '</td> '
+                    html += ' <td>' + o.mobile+'</td> '
+
+                    html += ' <td class="td-manage"> '
+                    html += ' <a title="编辑" permission ="sys:user:edit" class="use-button" href="javascript:;" onclick="updateStudent(' + "'" + o.userId + "'" + ')" class="ml-5" style="text-decoration:none"> '
+                    html += ' <i class="Hui-iconfont" >&#xe6df;</i> '
+                    html += ' </a> '
+                    html += ' <a style="text-decoration:none" onClick="deleteStudent(' + "'" + o.businessNumber + "'" + ')" href="javascript:;" permission ="sys:user:delete"  class="use-button" title="删除"> '
+                    html += ' <i class="Hui-iconfont " >&#xe6e2;</i></a> '
+                    html += ' </td> '
+
+                    html += ' </tr> ';
+                });
+
+            return html;
+        };
+
+        var name = $("#name").val();
+        var mobile = $("#mobile").val();
+        var pageUserQueryReq = {};
+        pageUserQueryReq.name = name;
+        pageUserQueryReq.mobile = mobile;
+
+        tableInit(baseUrl + 'user/listStudentPage', 10, pageUserQueryReq, insertHtml);
+    }
+
+    getDate();
+
+    // 提交表单
+    $("#sub").click(function () {
+        getDate();
+    });
+    //增加学生
+    function addStudent() {
+        layer_show('添加学生信息', './StudentEdit.html', '800', '600');
+    }
+
+    //更新用户
+    function updateStudent(userId) {
+        layer_show('更新用户信息', './StudentEdit.html?userId=' + userId, '800', '600');
+    }
+    //刷新当前页面
+    function localRefresh() {
+        getDate();
+    }
+    //用户编辑回调函数
+    var deleteUserCallBack = function userEditCallBack() {
+        layer.msg('删除成功', {icon: '-1', time: 1000});
+        setTimeout(localRefresh, 1000);
+    };
+
+    //删除用户
+    function deleteStudent(object) {
+        layer.confirm('确定要删除该用户吗？', function () {
+            const userReq = {};
+            userReq.businessNumber = object;
+            sendGetFormDateAjax(baseUrl + "user/deleteStudentByBusinessNumber", userReq, deleteUserCallBack);
+        });
+    }
+
+
+
+    $(function () {
+        getPerms();
+    });
+</script>
+
+</body>
+</html>

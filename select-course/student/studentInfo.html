@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>编辑用户信息</title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+<body>
+<!--自定义代码start-->
+<article class="cl pd-20">
+    <div class="form form-horizontal">
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">头像：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <img src="" class="img">
+                <input type="file" id="imagePath" class="input-text imagePath" value="选择头像">
+                <input type="hidden" id="userImage">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">用户Id：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" id="userId" readonly name="userId">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">学生学号：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" readonly name="businessNumber" id="businessNumber">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">学生名字：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" id="name" readonly name="name">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">班级：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" readonly name="className" id="className">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">性别：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" id="userSex" readonly name="userSex">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">电话：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" name="mobile" id="mobile">
+            </div>
+        </div>
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">IdCard：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" id="idCard" readonly name="idCard">
+            </div>
+        </div>
+
+        <div class="row cl">
+            <label class="form-label col-xs-4 col-sm-2">总学分：</label>
+            <div class="formControls col-xs-8 col-sm-9">
+                <input type="text" class="input-text" readonly name="sumCredit" id="sumCredit">
+            </div>
+        </div>
+        <div class="row cl">
+            <div class="col-xs-8 col-sm-9 col-xs-offset-4 col-sm-offset-3">
+                <input class="btn btn-primary radius" type="button" id="submitFrom" value="&nbsp;&nbsp;提交&nbsp;&nbsp;">
+            </div>
+        </div>
+    </div>
+</article>
+
+<!--自定义代码end-->
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+
+<script>
+    _token = window.localStorage.getItem('AuthorizationToken'),
+        $(function () {
+            //编辑时 把课程信息显示在页面上
+            var courseInfoCallBack = function setCourseInfo(result) {
+                var courseInfo = result.data;
+                $("#userId").val(courseInfo.userId);
+                $("#businessNumber").val(courseInfo.businessNumber);
+                $("#name").val(courseInfo.name);
+                $("#className").val(courseInfo.className);
+                $("#userId").val(courseInfo.userId);
+                $("#userSex").val(courseInfo.userSex);
+                $("#mobile").val(courseInfo.mobile);
+                $("#idCard").val(courseInfo.idCard);
+                $("#sumCredit").val(courseInfo.sumCredit);
+                $(".img").attr("src",courseInfo.imageUrl);
+            }
+            //获取url参数的用户id
+            var userId = getParameter("userId");
+
+            //用户id不为空则要获取用户信息
+            if (userId != null && typeof (userId) != 'undefined') {
+                var userReq = {};
+                userReq.userId = userId;
+                sendGetFormDateAjax(baseUrl + "userCourse/selectStudentInfoByUserId", userReq, courseInfoCallBack);
+
+            }
+            $("#imagePath").change(function () {
+                $(".img").attr("src", URL.createObjectURL($(this)[0].files[0]));
+            });
+            $("#submitFrom").click(function () {
+                upload();
+            })
+        });
+
+
+    /**
+     * 上传图片
+     */
+    function upload() {
+        //_token = window.localStorage.getItem('AuthorizationToken'),
+        if ($("#imagePath").val() == '') {
+            return;
+        }
+        var formData = new FormData();
+        formData.append('photo', document.getElementById('imagePath').files[0]);
+        $.ajax({
+            url: baseUrl + "user/uploadPhoto",
+            type: "post",
+            data: formData,
+            contentType: false,
+            processData: false,
+            beforeSend: function (request) {
+                //添加请求头
+                request.setRequestHeader("AuthorizationToken", _token);
+            },
+            success: function (data) {
+                if (data.code == "9999") {
+                    $(".img").attr("src", data.data.accessPath);
+                    const imgSrc = data.data.imagePath;
+                    $("#userImage").val(imgSrc);
+                    var savePhotoReq = {};
+                    savePhotoReq.userId = $("#userId").val();
+                    savePhotoReq.imagePath = imgSrc;
+                    alert(savePhotoReq.userId);
+                    alert(  savePhotoReq.imagePath);
+                    saveUserInfo(savePhotoReq);
+                } else {
+                    alert(data.message);
+                }
+            },
+            error: function (data) {
+                alert("上传失败")
+            }
+        });
+    }
+
+    function saveUserInfo(savePhotoReq) {
+        $.ajax({
+            url: baseUrl + "user/savePhoto",
+            type: "post",
+            data:JSON.stringify(savePhotoReq) ,
+            contentType:"application/json;charset=utf-8",
+            beforeSend: function (request) {
+                //添加请求头
+                request.setRequestHeader("AuthorizationToken", _token);
+            },
+
+        })
+    }
+
+</script>
+
+
+</body>
+</html>

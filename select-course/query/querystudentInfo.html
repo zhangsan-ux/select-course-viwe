@@ -1,0 +1,148 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+
+<body>
+<section>
+    <nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+        <span class="c-gray en">&gt;</span>
+        查询学生信息
+        <span class="c-gray en">&gt;</span>
+        信息列表
+        <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" onclick="getDate();" title="刷新"><i
+                class="Hui-iconfont">&#xe68f;</i></a>
+    </nav>
+    <div class="Hui-article">
+        <article class="cl pd-20">
+            <div class="text-c">
+                <form id="#form1">
+                    学号：<input type="text" class="input-text" style="width:250px" placeholder="输入学号" id="businessName"
+                                                         name="businessName"/>
+                    学生名字：<input type="text" class="input-text" style="width:250px" placeholder="输入学生名字" id="name"
+                                name="name">
+                    课程名称：<input type="text" class="input-text" style="width:250px" placeholder="输入课程名称" id="courseName"
+                              name="courseName">
+                    课程教室：<input type="text" class="input-text" style="width:250px" placeholder="输入课程教室" id="classroomName"
+                                name="classroomName">
+                    班级：<input type="text" class="input-text" style="width:250px" placeholder="输入班级" id="className"
+                              name="className">
+
+                    <button type="button" class="btn btn-success radius user-button" permission="sys:query:studentInfo" id="sub" name=""  onclick="getDate()"><i
+                            class="Hui-iconfont">&#xe665;</i> 查询
+                    </button>
+                    <button class="btn btn-success radius" id="btn_clear" name="btn_clear"><i
+                            class="Hui-iconfont">&#xe66b;</i> 清空
+                    </button>
+
+                </form>
+            </div>
+            <div class="cl pd-5 bg-1 bk-gray mt-20">
+                <span class="l">
+
+
+                </span>
+                <span class="r">共有数据：<strong id="total">0</strong> 条</span></div>
+            <div class="mt-20">
+                <table class="table table-border table-bordered table-bg table-hover table-sort">
+                    <thead>
+                    <tr class="text-c">
+                        <th width="25"><input type="checkbox" name="" value=""></th>
+                        <th width="80" style="display:none">ID</th>
+                        <th width="80px">学号</th>
+                        <th width="80px">学生名字</th>
+                        <th width="80px">课程名称</th>
+                        <th width="80">班级</th>
+                        <th width="120">课程教室</th>
+                        <th width="80">性别</th>
+                        <th width="120">总学分</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tbody" class="text-c">
+                    </tbody>
+                </table>
+                <!-- 分页标签 -->
+                <div id="page1" class="pager"></div>
+            </div>
+        </article>
+    </div>
+</section>
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="../../static/h-ui.selectcourse/js/H-ui.admin.page.js"></script>
+
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+<script type="text/javascript" src="../../common/page.js"></script>
+<script type="text/javascript">
+    function getDate() {
+        var insertHtml = function (result) {
+            var html = "";
+            $.each(result.data,
+                function (i, o) {
+                    html += ' <tr class="text-c"> '
+                    html += ' <td><input type="checkbox" value="' + o.businessNumber + '" name="table_id" class="table_id"></td> '
+                    html += ' <td style="display:none">' + o.businessNumber + '</td> '
+                    html += ' <td>' + o.businessNumber + '</td> '
+                    html += ' <td>' + o.name + '</td> '
+                    html += ' <td>' + o.courseName + '</td> '
+                    html += ' <td>' + o.className + '</td> '
+                    html += ' <td>' + o.classroomName+'</td> '
+                    html += ' <td>' + o.userSex + '</td> '
+                    html += ' <td>' + o.sumCredit+'</td> '
+                    html += ' </tr> ';
+                });
+
+            $("#tbody").html(html);
+        };
+
+        var businessName = $("#businessName").val();
+        var name = $("#name").val();
+        var courseName = $("#courseName").val();
+        var classroomName = $("#classroomName").val();
+        var className = $("#className").val();
+
+        var pageUserQueryReq = {};
+        pageUserQueryReq.businessName = businessName;
+        pageUserQueryReq.name = name;
+        pageUserQueryReq.courseName = courseName;
+        pageUserQueryReq.classroomName = classroomName;
+        pageUserQueryReq.className = className;
+
+        sendPostAjax(baseUrl + 'user/queryStudentInfo',  pageUserQueryReq, insertHtml);
+    }
+
+    getDate();
+
+    // 提交表单
+    $("#sub").click(function () {
+        getDate();
+    });
+
+
+    //删除用户
+    function deleteStudent(object) {
+        layer.confirm('确定要删除该用户吗？', function () {
+            const userReq = {};
+            userReq.businessNumber = object;
+            sendGetFormDateAjax(baseUrl + "user/deleteStudentByBusinessNumber", userReq, deleteUserCallBack);
+        });
+    }
+
+    $(function () {
+        getPerms();
+    })
+</script>
+
+</body>
+</html>

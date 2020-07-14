@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+
+<body>
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+    <span class="c-gray en">&gt;</span>
+    课程管理
+    <span class="c-gray en">&gt;</span>
+    课程列表
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" onclick="getDate();" title="刷新"><i
+            class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+<div class="Hui-article">
+    <article class="cl pd-20">
+        <div class="text-c">
+            <form id="#form1">
+                课程名称：<input type="text" class="input-text" style="width:250px" placeholder="输入 课程名称" id="courseName"
+                          name="name">
+
+                <button type="button" class="btn btn-success radius" id="sub" name=""  onclick="getDate()"><i
+                        class="Hui-iconfont">&#xe665;</i> 查询
+                </button>
+                <button class="btn btn-success radius" id="btn_clear" name="btn_clear"><i
+                        class="Hui-iconfont">&#xe66b;</i> 清空
+                </button>
+
+            </form>
+        </div>
+        <div class="cl pd-5 bg-1 bk-gray mt-20">
+                <span class="l">
+
+                    <a href="javascript:;" onclick="addCourse()" class="btn btn-primary radius use-button" permission="sys:course:add">
+                        <i class="Hui-iconfont">&#xe600;</i> 添加课程
+                    </a>
+                    <a href="javascript:;" onclick="deleteStudent()" class="btn btn-danger radius use-button" permission="sys:course:delete">
+                        <i class="Hui-iconfont">&#xe609;</i> 删除课程
+                    </a>
+                    <a href="javascript:;" onclick="exportStudent()" class="btn btn-primary radius">
+                        <i class="Hui-iconfont">&#xe644;</i> 导出课程信息
+                    </a>
+                </span>
+            <span class="r">共有数据：<strong id="total">0</strong> 条</span></div>
+        <div class="mt-20">
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                <tr class="text-c">
+                    <th width="25"><input type="checkbox" name="" value=""></th>
+                    <th width="80" style="display:none">ID</th>
+                    <th width="80px">课程ID</th>
+                    <th width="80px">课程名字</th>
+                    <th width="80px">课程学分</th>
+                    <th width="120">操作</th>
+                </tr>
+                </thead>
+                <tbody id="tbody" class="text-c">
+                </tbody>
+            </table>
+            <!-- 分页标签 -->
+            <div id="page1" class="pager"></div>
+        </div>
+    </article>
+</div>
+</section>
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="../../static/h-ui.selectcourse/js/H-ui.admin.page.js"></script>
+
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+<script type="text/javascript" src="../../common/page.js"></script>
+<script type="text/javascript">
+    function getDate() {
+        var insertHtml = function (list) {
+            var html = "";
+            $.each(list,
+                function (i, o) {
+                    html += ' <tr class="text-c"> '
+                    html += ' <td><input type="checkbox" value="' + o.courseId + '" name="table_id" class="table_id"></td> '
+                    html += ' <td style="display:none">' + o.courseId + '</td> '
+                    html += ' <td>' + o.courseId + '</td> '
+                    html += ' <td>' + o.courseName + '</td> '
+                    html += ' <td>' + o.courseCredit + '</td> '
+                    html += ' <td class="td-manage"> '
+                    html += ' <a title="编辑" href="javascript:;" onclick="updateCourse(' + "'" + o.courseId + "'" + ')" class="ml-5 use-button " permission="sys:course:edit" style="text-decoration:none" > '
+                    html += ' <i class="Hui-iconfont">&#xe6df;</i> '
+                    html += ' </a> '
+                    html += ' <a style="text-decoration:none" onClick="deleteCourse(' + "'" + o.courseId + "'" + ')" href="javascript:;" class="use-button " permission="sys:course:delete" title="删除"> '
+                    html += ' <i class="Hui-iconfont">&#xe6e2;</i></a> '
+                    html += ' </td> '
+
+                    html += ' </tr> ';
+                });
+
+            return html;
+        };
+
+        var courseName = $("#courseName").val();
+
+        var pageUserQueryReq = {};
+        pageUserQueryReq.courseName = courseName;
+
+
+        tableInit(baseUrl + 'course/listCoursePage', 10, pageUserQueryReq, insertHtml);
+    }
+
+    getDate();
+    // 提交表单
+    $("#sub").click(function () {
+        getDate();
+    });
+    //增加课程
+    function addCourse() {
+        layer_show('添加课程信息', './CourseEdit.html', '800', '600');
+    }
+    //更新用户
+    function updateCourse(courseId) {
+        layer_show('更新课程信息', './CourseEdit.html?courseId=' + courseId, '800', '600');
+    }
+    //刷新当前页面
+    function localRefresh() {
+        getDate();
+    }
+
+    //用户编辑回调函数
+    var deleteCourseCallBack = function courseEditCallBack() {
+        layer.msg('删除成功', {icon: '-1', time: 1000});
+        setTimeout(localRefresh, 1000);
+    };
+
+    //删除用户course
+    function deleteCourse(object) {
+        layer.confirm('确定要删除该课程吗？', function () {
+            const userReq = {};
+            userReq.courseId = object;
+            sendGetFormDateAjax(baseUrl + "course/deleteCourseByCourseId", userReq, deleteCourseCallBack);
+        });
+    }
+    $(function () {
+        getPerms();
+    });
+</script>
+
+</body>
+</html>

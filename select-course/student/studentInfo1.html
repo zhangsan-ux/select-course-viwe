@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/skin/default/skin.css" id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../../static/h-ui.selectcourse/css/style.css"/>
+    <!--layui start-->
+    <link rel="stylesheet" href="../../static/layui/css/layui.css" media="all">
+</head>
+
+<body>
+
+<nav class="breadcrumb"><i class="Hui-iconfont">&#xe67f;</i> 首页
+    <span class="c-gray en">&gt;</span>
+    课程管理
+    <span class="c-gray en">&gt;</span>
+    课程列表
+    <a class="btn btn-success radius r" style="line-height:1.6em;margin-top:3px" onclick="getDate();" title="刷新"><i
+            class="Hui-iconfont">&#xe68f;</i></a>
+</nav>
+<div class="Hui-article">
+    <article class="cl pd-20">
+
+        <div class="mt-20">
+            <table class="table table-border table-bordered table-bg table-hover table-sort">
+                <thead>
+                <tr class="text-c">
+                    <!--<th width="25"><input type="checkbox" name="" value=""></th>-->
+                    <th width="80px">用户Id</th>
+                    <th width="80px">学生学号</th>
+                    <th width="80px">学生名字</th>
+                    <th width="80px">班级</th>
+                    <th width="80px">学生性别</th>
+                    <th width="80px">学生电话</th>
+                    <th width="80px">学生身份证</th>
+                    <th width="80px">学生总学分</th>
+                    <th width="120">头像</th>
+                </tr>
+                </thead>
+                <tbody id="tbody" class="text-c">
+                </tbody>
+            </table>
+            <!-- 分页标签 -->
+            <div id="page1" class="pager"></div>
+        </div>
+    </article>
+</div>
+</section>
+<script type="text/javascript" src="../../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../../static/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="../../static/h-ui.selectcourse/js/H-ui.admin.page.js"></script>
+
+<script src="../../static/layui/layui.js"></script>
+<script type="text/javascript" src="../../common/ajax.js"></script>
+<script type="text/javascript" src="../../common/page.js"></script>
+<script type="text/javascript">
+    function getDate() {
+        var insertHtml = function (result) {
+            var html = "";
+           // var studentInfo = result.date;
+            var userId =result.data.userId;
+            var businessNumber = result.data.businessNumber ;
+            var name = result.data.name;
+            var className = result.data.className;
+            var  userSex = result.data.userSex;
+            var mobile = result.data.mobile;
+            var idCard = result.data.idCard;
+            var  sumCredit = result.data.sumCredit;
+            var imageUrl = result.data.imageUrl;
+                    html += ' <tr class="text-c"> '
+                    html += ' <td>' + userId + '</td> '
+                    html += ' <td>' + businessNumber + '</td> '
+                    html += ' <td>' + name + '</td> '
+                    html += ' <td>' + className+ '</td> '
+                    html += ' <td>' + userSex + '</td> '
+                    html += ' <td>' + mobile + '</td> '
+                    html += ' <td>' + idCard + '</td> '
+                    html += ' <td>' + sumCredit + '</td> '
+                    html += ' <td>' + imageUrl + '</td> '
+                    html += ' </tr> ';
+
+
+            $("#tbody").html(html);
+        };
+
+        var courseName = $("#courseName").val();
+
+        var pageUserQueryReq = {};
+        pageUserQueryReq.courseName = courseName;
+
+
+       sendGetFormDateAjax(baseUrl + 'userCourse/selectStudentInfoByUserId', {},insertHtml);
+    }
+
+    getDate();
+    // 提交表单
+
+
+</script>
+
+</body>
+</html>

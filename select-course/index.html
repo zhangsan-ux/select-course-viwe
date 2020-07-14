@@ -1,0 +1,225 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <title>用户管理系统</title>
+    <link rel="stylesheet" type="text/css" href="../static/h-ui/css/H-ui.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/h-ui.selectcourse/css/H-ui.admin.css"/>
+    <link rel="stylesheet" type="text/css" href="../lib/Hui-iconfont/1.0.8/iconfont.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/h-ui.selectcourse/skin/default/skin.css"
+          id="skin"/>
+    <link rel="stylesheet" type="text/css" href="../static/h-ui.selectcourse/css/style.css"/>
+    <link rel="stylesheet" href="../static/layui/css/layui.css" media="all">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<header class="navbar-wrapper">
+    <div class="navbar navbar-fixed-top">
+        <div class="container-fluid cl"><a class="logo navbar-logo f-l mr-10 hidden-xs">学生选课管理系统</a>
+            <span class="logo navbar-slogan f-l mr-10 hidden-xs"></span>
+            <a aria-hidden="false" class="nav-toggle Hui-iconfont visible-xs" href="javascript:;">&#xe667;</a>
+            <nav class="nav navbar-nav">
+
+            </nav>
+            <nav id="Hui-userbar" class="nav navbar-nav navbar-userbar hidden-xs">
+                <ul class="cl">
+                    <li class="dropDown dropDown_hover">
+                        <a href="#" class="dropDown_A" id="name"> <i class="Hui-iconfont"></i></a>
+                        <ul class="dropDown-menu menu radius box-shadow">
+                            <li class=""><a href="javascript:;" onclick="studentinfo()" id="studentINFO">个人信息</a></li>
+                            <li class=""><a href="" id="logout">退出</a></li>
+                        </ul>
+                    </li>
+                    <li id="Hui-skin" class="dropDown right dropDown_hover"><a href="javascript:;" class="dropDown_A"
+                                                                               title="换肤"><i class="Hui-iconfont"
+                                                                                             style="font-size:18px">&#xe62a;</i></a>
+                        <ul class="dropDown-menu menu radius box-shadow">
+                            <li><a href="javascript:;" data-val="default" title="默认（黑色）">默认（黑色）</a></li>
+                            <li><a href="javascript:;" data-val="blue" title="蓝色">蓝色</a></li>
+                            <li><a href="javascript:;" data-val="green" title="绿色">绿色</a></li>
+                            <li><a href="javascript:;" data-val="red" title="红色">红色</a></li>
+                            <li><a href="javascript:;" data-val="yellow" title="黄色">黄色</a></li>
+                            <li><a href="javascript:;" data-val="orange" title="橙色">橙色</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</header>
+<!--/_header 作为公共模版分离出去-->
+
+<!--_menu 作为公共模版分离出去-->
+<aside class="Hui-aside">
+
+    <div class="menu_dropdown bk_2">
+
+    </div>
+</aside>
+
+<section class="Hui-article-box">
+    <div id="iframe_box">
+        <div class="show_iframe">
+            <div style="display:none" class="loading"></div>
+            <iframe id="iframe-welcome" data-scrolltop="0" scrolling="yes" frameborder="0"
+                    src=""></iframe>
+        </div>
+    </div>
+</section>
+</body>
+<script type="text/javascript" src="../lib/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../static/h-ui/js/H-ui.js"></script>
+<script type="text/javascript" src="../static/h-ui.selectcourse/js/H-ui.admin.page.js"></script>
+<!--/_footer /作为公共模版分离出去-->
+
+<!--请在下方写此页面业务相关的脚本-->
+<script type="text/javascript" src="../lib/My97DatePicker/4.8/WdatePicker.js"></script>
+<script type="text/javascript" src="../lib/jquery.validation/1.14.0/jquery.validate.js"></script>
+<script type="text/javascript" src="../lib/jquery.validation/1.14.0/validate-methods.js"></script>
+<script type="text/javascript" src="../lib/jquery.validation/1.14.0/messages_zh.js"></script>
+
+<!--layui分页-->
+<script src="../lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="../static/layui/layui.js"></script>
+<script type="text/javascript" src="../common/ajax.js"></script>
+<script>
+
+    $(function () {
+        var userInfoJson = window.localStorage.getItem('userInfo');
+        //权限数组
+        var permissionArrs = window.localStorage.getItem("permissions");
+        var permissionArr =jQuery.parseJSON(permissionArrs);
+        if (typeof (userInfoJson) != "undefined" && userInfoJson != null) {
+            //转换对象
+            var userLoginResp = jQuery.parseJSON(userInfoJson);
+            var name = userLoginResp.name;
+            var userId = userLoginResp.userId;
+            $("#name").text(name);
+
+        }
+
+        //退出
+        $("#logout").click(function () {
+            window.localStorage.clear();
+            location.href = loginUrl;
+        });
+       // var permissionArr =[jQuery.parseJSON(permissionJson)] ;
+       // alert("11111111"+permissionArr);
+
+        //菜单处理
+        function menuHandle(menuJson, isAppend) {
+            let str = "";
+            for (let i = 0; i < menuJson.length; i++) {
+                if (isAppend) {
+                    str += "<li class='current-li'><a href=\"#\" class='toUrl' title=\"" + menuJson[i].name + "\" " +
+                            "to-url=" + menuJson[i].url +
+                        ">" + menuJson[i].name + "</a></li>\n";
+                    //按钮处理
+                    if (typeof (menuJson[i].childMenus) != "undefined" && menuJson[i].childMenus != null && menuJson[i].childMenus.length > 0) {
+                        for (let j = 0; j < menuJson[i].childMenus.length; j++) {
+                            permissionArr.push(menuJson[i].childMenus[j].perms);
+                            window.localStorage.setItem("permissionArr", permissionArr);
+                        }
+                    }
+                } else {
+                    str += "  <dl id=\"\" class='content'>\n" +
+                        "            <dt><i class=\"Hui-iconfont\">&#xe616;</i> " + menuJson[i].name + "<i class=\"Hui-iconfont menu_dropdown-arrow\">&#xe6d5;</i></dt>\n" +
+                        "            <dd>\n";
+                    //拥有下一级
+                    if (typeof (menuJson[i].childMenus) != "undefined" && menuJson[i].childMenus != null && menuJson[i].childMenus.length > 0) {
+                        str += "<ul>\n";
+                        str += menuHandle(menuJson[i].childMenus, true);
+                        str += "</ul>\n";
+                    }
+
+                    str += "            </dd>\n" +
+                        "        </dl>";
+                }
+            }
+            return str;
+        }
+
+        function initMenu() {
+            var json = getMenu();
+            const html = menuHandle(json, false);
+            $(".menu_dropdown").append(html);
+        }
+
+        initMenu();
+
+        $(".toUrl ").click(function (event) {
+            //清除冒泡事件
+            event.stopPropagation();
+            $('.current-li').removeClass('current');
+            $(this).parent().addClass('current');
+
+            var toUrl = $(this).attr("to-url");
+            $("#iframe-welcome").attr("src", toUrl);
+        });
+
+        function initSelect() {
+            $(".content").find("dt").eq("0").addClass("selected");
+            //展开
+            $(".content").find("dd").eq(0).css("display", "block");
+            //选中的菜单变颜色
+            $(".content").find("dd").eq(0).find("ul li").eq(0).addClass("current");
+            const toUrl = $(".content").find("dd").eq(0).find("ul li").eq(0).find('a').eq(0).attr("to-url");
+            $("#iframe-welcome").attr("src", toUrl);
+        }
+
+        initSelect();
+
+        $(".content").click(function () {
+
+            //判断当前是展开还是关闭
+            var flag = $(this).find("dt").eq("0").hasClass("selected");
+            if (flag) {
+                //选中
+                $(".content").find("dt").removeClass("selected");
+                $(".content").find("dd").css("display", "none");
+                $(".content").find(".current").removeClass("current");
+            } else {
+
+                $(".content").find("dt").removeClass("selected");
+                $(".content").find("dd").css("display", "none");
+                $(".content").find(".current").removeClass("current");
+
+
+                $(this).find("dt").eq(0).addClass("selected");
+                //展开
+                $(this).find("dd").eq(0).css("display", "block");
+                $(this).find("dd").eq(0).find("ul li").eq(0).addClass("current");
+            }
+        });
+
+    });
+
+
+    function studentinfo() {
+        var userInfoJson = window.localStorage.getItem('userInfo');
+        if (typeof (userInfoJson) != "undefined" && userInfoJson != null) {
+            //转换对象
+            var userLoginResp = jQuery.parseJSON(userInfoJson);
+            //var name = userLoginResp.name;
+            var userId = userLoginResp.userId;
+            layer_show("学生个人信息", "student/studentInfo.html?userId=" + userId, null)
+
+        }
+    }
+    $("#studentINFO").click(function (){
+        studentinfo();
+    })
+</script>
+
+</html>
+
